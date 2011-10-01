@@ -1,5 +1,6 @@
 <?php
     namespace murphy;
+    use Exception,Closure;
     
     class Fixture
     {
@@ -13,18 +14,60 @@
             $this->data = array();
         }
         
-        public static function add($name,Closure $callback)
+        private static function instance()
         {
             if(self::$instance === NULL)
                 self::$instance = new Fixture();
             
-            if(isset(self::$instance->callbacks[$name]))
+            return self::$instance;
+        }
+        
+        public static function add($name,Closure $callback)
+        {
+            
+            if(isset(self::instance()->callbacks[$name]))
                 throw new DuplicateFixtureException('You have already added a fixture called: '.$name);
             
-            self::$instance->callbacks[$name] = $callback;
+            self::instance()->callbacks[$name] = $callback;
+        }
+        
+        public function execute()
+        {
+die(print_r($this->data));
+            $tables = array();
+            
+            foreach($this->data as $database => $d)
+                $tables = array_merge($tables,$d['tables']);
+            
+            $tables = array_unique($tables);
+            
+            foreach($this->data as $d)
+            {
+                $args = array();
+
+                foreach($d['rows'] as $row)
+                {
+                    foreach($row as $index => $line)
+                        $args[$d['header'][$index]] = $line;
+                    
+                    die(print_r($args));
+                }
+            }
+        }
+
+        public function also($file)
+        {
+            $this->extractFixtureDataFromFile($file);
+            return $this;
         }
         
         public static function load($file)
+        {
+            self::instance()->extractFixtureDataFromFile($file);
+            return self::instance();
+        }
+        
+        private function extractFixtureDataFromFile($file)
         {
             $path = PACKAGES_DIR.'/'.$file;
             require_once($path);
@@ -53,22 +96,26 @@
             foreach($docblocks as $fixture_name => $block)
             {
                 $this->data[$fixture_name] = array('rows' => array());
-        
+                $database = 'default';
+
                 foreach($block as $b)
                 {
                     if(strpos(trim($b),'/*') !== 0)
                     {
                         $b = trim(str_replace('*','',$b));
                         
-                        if(strpos($b,'@tables ') === 0)
+                        if(strpos($b,'@database ') === 0)
+                            $database = trim(str_replace('@database','',$b));
+                        else if(strpos($b,'@tables ') === 0)
                             $this->data[$fixture_name]['tables'] = explode(',',trim(str_replace('@tables','',$b)));
                         else if(!isset($this->data[$fixture_name]['header']))
                             $this->data[$fixture_name]['header'] = array_map('trim',explode('|',$b));
                         else
                             $this->data[$fixture_name]['rows'][] = array_map('trim',explode('|',$b));
-                        
                     }
                 }
+                
+                $this->data[$fixture_name]['database'] = $database;
             }
         }
     }
