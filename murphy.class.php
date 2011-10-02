@@ -1,27 +1,31 @@
 <?php
-    namespace murphy;
-
-    class Murphy implements \rocketsled\Runnable
+    class Murphy implements rocketsled\Runnable
     {
         public function run()
         {
-            if(Application::param('include'))
-                $include = explode(',',Application::param('include'));
-            else
+            if(!$include = Args::get('include',Args::argv))
                 $include = array();
-
-            if(Application::param('exclude'))
-                $exclude = explode(',',Application::param('exclude'));
             else
+                $include = explode(',',$include);
+
+            if(!$exclude = Args::get('exclude',Args::argv))
                 $exclude = array();
-
-
-            $files = shell_exec('find . -name "test_*.class.php"');
+            else
+                $exclude = explode(',',$exclude);
             
-            foreach(explode(PHP_EOL,$files) as $path)
+            $tests = rocketsled\filteredPackages(function($arg)
+            {
+                $ret = FALSE;
+                
+                if(rocketsled\endsWith($arg,'.murphy') && is_dir($arg))
+                    $ret = $arg;
+                
+                return $ret;
+            });
+
+            foreach($tests as $path)
             {
                 $output = '';
-                $class = rsFileToClass(basename($path));
                 
                 if(count($include))
                     $use = FALSE;
@@ -42,31 +46,23 @@
                 
                 if($use)
                 {
-                    try
-                    {
-                        $refl = new ReflectionClass($class);
-                        
-                        if($refl->isSubClassOf('TestHandler'))
-                        {
-                            exec('php index.php h='.$class.' mysql_root='.escapeshellarg(Application::param('mysql_root')),$output,$exit_code);
+                    if(!file_exists($path.'/run.php'))
+                        throw new InvalidMurphyTestException('A murphy test directory must contain a file called run.php');
+
+                    exec('php index.php "murphy\\Test" path='.escapeshellarg($path.'/run.php').' mysql_root='.escapeshellarg(Args::get('mysql_root',Args::argv)),$output,$exit_code);
                             
-                            if($exit_code)
-                                echo 'FATAL ERROR: '.$class.' terminated abnormally'.PHP_EOL;
+                    if($exit_code)
+                        echo 'FATAL ERROR: '.$path.' terminated abnormally'.PHP_EOL;
     
-                            echo PHP_EOL.'====Output from '.$class.'==========='.PHP_EOL;
+                    echo PHP_EOL.'====Output from '.$path.'==========='.PHP_EOL;
                             
-                            foreach($output as $opline)
-                                echo $opline.PHP_EOL;
+                    foreach($output as $opline)
+                        echo $opline.PHP_EOL;
     
-                            echo PHP_EOL.'====================================='.PHP_EOL;
-                        }
-                    }
-                    
-                    catch(ReflectionException $exc)
-                    {
-                        //echo PHP_EOL.'The class: '.$class.' looks like it should exist, but it doesn\'t'.PHP_EOL;
-                    }
+                    echo PHP_EOL.'====================================='.PHP_EOL;
                 }
             }
         }
     }
+
+    class InvalidMurphyTestException extends Exception{}
