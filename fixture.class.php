@@ -54,7 +54,11 @@
             if(count($databases))
             {
                 if(!$mysql_root = Args::get('mysql_root',Args::argv))
+                {
+                    echo 'You need to include mysql_root in the command line arguments'.PHP_EOL;
                     exit(1);
+                }
+                    
 
                 foreach($databases as $database => $tables)
                 {
@@ -103,7 +107,7 @@
                     }
                 }
             }
-            
+
             if($db_connect instanceof Closure)
                 $db_connect($aliases);
 
