@@ -6,6 +6,14 @@
     {
         public function run()
         {
+            echo 'EXPECTED OUTPUT:'.PHP_EOL;
+            echo 'non db fixture
+non db fixture
+Non db fixture 2
+Non db fixture 2
+iain@workingsoftware.com.au
+iaindooley@gmail.com'.PHP_EOL.PHP_EOL;
+
             if(!$mysql_root = Args::get('mysql_root',Args::argv))
                 die('You need to pass in mysql_root');
 
