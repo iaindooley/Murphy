@@ -94,17 +94,16 @@
             foreach($this->data as $fixture_name => $d)
             {
                 if(isset($aliases[$d['database']]))
-                {
                     mysql_select_db($aliases[$d['database']][3]);
-                    $args = array();
+
+                $args = array();
     
-                    foreach($d['rows'] as $row)
-                    {
-                        foreach($row as $index => $line)
-                            $args[$d['header'][$index]] = $line;
+                foreach($d['rows'] as $row)
+                {
+                    foreach($row as $index => $line)
+                        $args[$d['header'][$index]] = $line;
     
-                        self::instance()->callbacks[$fixture_name]($args);
-                    }
+                    self::instance()->callbacks[$fixture_name]($args);
                 }
             }
 
