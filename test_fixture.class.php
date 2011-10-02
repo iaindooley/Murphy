@@ -1,12 +1,15 @@
 <?php
-    class TestFixture implements rocketsled\Runnable
+    namespace murphy;
+    use Args,Plusql;
+
+    class TestFixture implements \rocketsled\Runnable
     {
         public function run()
         {
             if(!$mysql_root = Args::get('mysql_root',Args::argv))
-                exit(1);
+                die('You need to pass in mysql_root');
 
-            mysql_connect('localhost','root',$mysql_root);
+            mysql_connect('localhost','root',$mysql_root) or die(mysql_error());
             mysql_query('DROP DATABASE IF EXISTS test_fixture1');
             mysql_query('DROP DATABASE IF EXISTS test_fixture2');
             mysql_query('CREATE DATABASE test_fixture1');
@@ -54,8 +57,8 @@ CREATE TABLE `user_in_group` (
   PRIMARY KEY (`user_id`,`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1');
             
-            murphy\Fixture::load('murphy/sample.fixture.php')
-            ->also('murphy/sample2.fixture.php')
+            Fixture::load(dirname(__FILE__).'/sample.fixture.php')
+            ->also(dirname(__FILE__).'/sample2.fixture.php')
             ->execute(function($db_aliases)
             {
                 $credential_names = array('test_fixture1' => 'live',
@@ -65,7 +68,7 @@ CREATE TABLE `user_in_group` (
                     Plusql::credentials($credential_names[$src],$credentials);
             });
 
-            murphy\Fixture::load('murphy/sample3.fixture.php')->execute();
+            Fixture::load(dirname(__FILE__).'/sample3.fixture.php')->execute();
             
             foreach(Plusql::begin('live')->query('SELECT user_id,username FROM `user`')->user as $client)
                 echo $client->username.PHP_EOL;

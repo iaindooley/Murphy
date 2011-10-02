@@ -126,9 +126,8 @@
             return self::instance();
         }
         
-        private function extractFixtureDataFromFile($file)
+        private function extractFixtureDataFromFile($path)
         {
-            $path = PACKAGES_DIR.'/'.$file;
             require_once($path);
             $contents = file($path,FILE_IGNORE_NEW_LINES);
             $docblocks = array();
@@ -175,7 +174,7 @@
                 }
                 
                 if(!$database)
-                    throw new InvalidFixtureFormatException('You must specify the @database directive for fixture: '.$fixture_name.' in: '.$file);
+                    throw new InvalidFixtureFormatException('You must specify the @database directive for fixture: '.$fixture_name.' in: '.$path);
                     
                 $this->data[$fixture_name]['database'] = $database;
             }
