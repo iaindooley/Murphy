@@ -85,23 +85,28 @@
                 
                 if(!$db_connect instanceof Closure)
                     throw new DbFixtureConnectionException('You have included database fixtures without a callback to pass connection details to');
-                
-                $db_connect($aliases);
             }
 
             foreach($this->data as $fixture_name => $d)
             {
-                $args = array();
-
-                foreach($d['rows'] as $row)
+                if(isset($aliases[$d['database']]))
                 {
-                    foreach($row as $index => $line)
-                        $args[$d['header'][$index]] = $line;
-
-                    self::instance()->callbacks[$fixture_name]($args);
+                    mysql_select_db($aliases[$d['database']][3]);
+                    $args = array();
+    
+                    foreach($d['rows'] as $row)
+                    {
+                        foreach($row as $index => $line)
+                            $args[$d['header'][$index]] = $line;
+    
+                        self::instance()->callbacks[$fixture_name]($args);
+                    }
                 }
             }
             
+            if($db_connect instanceof Closure)
+                $db_connect($aliases);
+
             self::$instance = NULL;
         }
 

@@ -68,6 +68,6 @@ CREATE TABLE `user_in_group` (
             murphy\Fixture::load('murphy/sample3.fixture.php')->execute();
             
             foreach(Plusql::begin('live')->query('SELECT user_id,username FROM `user`')->user as $client)
-                echo $client->usernmae.PHP_EOL;
+                echo $client->username.PHP_EOL;
         }
     }
