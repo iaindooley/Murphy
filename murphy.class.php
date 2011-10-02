@@ -1,5 +1,7 @@
 <?php
-    class MurphyBddRunner extends TestHandler
+    namespace murphy;
+
+    class Murphy implements \rocketsled\Runnable
     {
         public function run()
         {
