@@ -22,25 +22,21 @@
             return self::$instance;
         }
         
-        public static function add($name,Closure $callback)
+        public static function add(Closure $callback)
         {
-            
-            if(isset(self::instance()->callbacks[$name]))
-                throw new DuplicateFixtureException('You have already added a fixture called: '.$name);
-            
-            self::instance()->callbacks[$name] = $callback;
+            self::instance()->callbacks[] = $callback;
         }
         
         public function execute(Closure $db_connect = NULL)
         {
             $databases = array();
 
-            foreach($this->data as $fixture => $d)
+            foreach($this->data as $key => $d)
             {
                 if(isset($d['tables']))
                 {
                     if(!isset($d['database']))
-                        throw new InvalidFixtureFormatException('You have included a @tables directive for '.$fixture.' but no @database directive');
+                        throw new InvalidFixtureFormatException('You have included a @tables directive for '.$d['tables'].' but no @database directive');
                     
                     if(!isset($databases[$d['database']]))
                         $databases[$d['database']] = array();
@@ -91,7 +87,7 @@
                     throw new DbFixtureConnectionException('You have included database fixtures without a callback to pass connection details to');
             }
 
-            foreach($this->data as $fixture_name => $d)
+            foreach($this->data as $key => $d)
             {
                 if(isset($aliases[$d['database']]))
                     mysql_select_db($aliases[$d['database']][3]);
@@ -103,7 +99,7 @@
                     foreach($row as $index => $line)
                         $args[$d['header'][$index]] = $line;
     
-                    self::instance()->callbacks[$fixture_name]($args);
+                    self::instance()->callbacks[$key]($args);
                 }
             }
 
@@ -146,13 +142,16 @@
                 
                 if($cur_docblock !== NULL)
                     $cur_docblock[] = $cont;
-                else if(preg_match('/murphy\\\\Fixture::add\(\'(.*)\'/U',$cont,$matches))
-                    $docblocks[$matches[1]] = $previous_docblock;
+                else if(preg_match('/murphy\\\\Fixture::add\(/U',$cont,$matches))
+                    $docblocks[] = $previous_docblock;
             }
+            
+            $offset = count($this->data);
         
-            foreach($docblocks as $fixture_name => $block)
+            foreach($docblocks as $key => $block)
             {
-                $this->data[$fixture_name] = array('rows' => array());
+                $cur_index = $key+$offset;
+                $this->data[$key+$offset] = array('rows' => array());
                 $database = 'non_db_fixture_'.microtime(true).rand(0,9999);
 
                 foreach($block as $b)
@@ -164,18 +163,18 @@
                         if(strpos($b,'@database ') === 0)
                             $database = trim(str_replace('@database','',$b));
                         else if(strpos($b,'@tables ') === 0)
-                            $this->data[$fixture_name]['tables'] = explode(',',trim(str_replace('@tables','',$b)));
-                        else if(!isset($this->data[$fixture_name]['header']))
-                            $this->data[$fixture_name]['header'] = array_map('trim',explode('|',$b));
+                            $this->data[$cur_index]['tables'] = explode(',',trim(str_replace('@tables','',$b)));
+                        else if(!isset($this->data[$cur_index]['header']))
+                            $this->data[$cur_index]['header'] = array_map('trim',explode('|',$b));
                         else
-                            $this->data[$fixture_name]['rows'][] = array_map('trim',explode('|',$b));
+                            $this->data[$cur_index]['rows'][] = array_map('trim',explode('|',$b));
                     }
                 }
                 
                 if(!$database)
                     throw new InvalidFixtureFormatException('You must specify the @database directive for fixture: '.$fixture_name.' in: '.$path);
                     
-                $this->data[$fixture_name]['database'] = $database;
+                $this->data[$cur_index]['database'] = $database;
             }
         }
     }
