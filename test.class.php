@@ -11,7 +11,7 @@
         {
             $this->tests = array();
         }
-
+        
         public static function add(Closure $function)
         {
             self::instance()->tests[] = $function;
