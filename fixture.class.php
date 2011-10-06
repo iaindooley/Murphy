@@ -98,7 +98,7 @@
                 {
                     foreach($row as $index => $line)
                         $args[$d['header'][$index]] = $line;
-    
+
                     self::instance()->callbacks[$key]($args);
                 }
             }
@@ -123,7 +123,7 @@
         
         private function extractFixtureDataFromFile($path)
         {
-            require_once($path);
+            require($path);
             $contents = file($path,FILE_IGNORE_NEW_LINES);
             $docblocks = array();
             $cur_docblock = NULL;
