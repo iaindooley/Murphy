@@ -55,7 +55,6 @@
                     exit(1);
                 }
                     
-
                 foreach($databases as $database => $tables)
                 {
                     mysql_connect('localhost','root',$mysql_root);
@@ -65,7 +64,10 @@
                     
                     foreach($tables as $table)
                     {
-                        $row = mysql_fetch_assoc(mysql_query('SHOW CREATE TABLE `'.$table.'`'));
+                        if(!$query = mysql_query('SHOW CREATE TABLE `'.$table.'`'))
+                            throw new Exception(mysql_error());
+
+                        $row = mysql_fetch_assoc($query);
                         $create_table_statements[] = $row['Create Table'];
                     }
 
