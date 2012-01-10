@@ -17,7 +17,7 @@
             {
                 $ret = FALSE;
                 
-                if(rocketsled\endsWith($arg,'.murphy') && is_dir($arg))
+                if(rocketsled\endsWith($arg,'.run.php'))
                     $ret = $arg;
                 
                 return $ret;
@@ -44,27 +44,19 @@
                 
                 if($use)
                 {
-                    $to_run = glob($path.'/*.run.php');
+                    $output = '';
 
-                    if(!count($to_run))
-                        throw new InvalidMurphyTestException('A murphy test directory must contain at least one file with extension .run.php trying to run: '.$path);
-                    
-                    foreach($to_run as $path)
-                    {
-                        $output = '';
-
-                        exec('php index.php "murphy\\Test" path='.escapeshellarg($path).' mysql_root='.escapeshellarg(Args::get('mysql_root',Args::argv)),$output,$exit_code);
-                                    
-                        if($exit_code)
-                            echo 'FATAL ERROR: '.$path.' terminated abnormally'.PHP_EOL;
-            
-                        echo PHP_EOL.'====Output from '.$path.'==========='.PHP_EOL;
-                                    
-                        foreach($output as $opline)
-                            echo $opline.PHP_EOL;
-            
-                        echo PHP_EOL.'====================================='.PHP_EOL;
-                    }
+                    exec('php index.php "murphy\\Test" path='.escapeshellarg($path).' mysql_root='.escapeshellarg(Args::get('mysql_root',Args::argv)),$output,$exit_code);
+                                
+                    if($exit_code)
+                        echo 'FATAL ERROR: '.$path.' terminated abnormally'.PHP_EOL;
+        
+                    echo PHP_EOL.'====Output from '.$path.'==========='.PHP_EOL;
+                                
+                    foreach($output as $opline)
+                        echo $opline.PHP_EOL;
+        
+                    echo PHP_EOL.'====================================='.PHP_EOL;
                 }
             }
         }
