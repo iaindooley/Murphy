@@ -42,6 +42,9 @@
                         $use = TRUE;
                 }
                 
+                if(strpos($path,'.murphy/') === FALSE)
+                    $use = FALSE;
+                
                 if($use)
                 {
                     $output = '';
