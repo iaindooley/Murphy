@@ -1,5 +1,5 @@
 <?php
-    rocketpack\Install::package('Murphy',array(0,0,0));
+    rocketpack\Install::package('Murphy',array(0,1,0));
 
     rocketpack\Dependencies::register(function()
     {
