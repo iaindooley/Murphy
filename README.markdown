@@ -22,7 +22,7 @@ The philosophy is simple: when you write a piece of code, write another piece of
 
 Murphy works with https://github.com/iaindooley/RocketSled. See the RocketSled page for more details on installing and using packages.
 
-For the same of this example, let's assume you've created a package called killerapp and you create a class called MakeThings:
+For the sake of this example, let's assume you've created a package called killerapp and you create a class called MakeThings:
 
 ```
 rs_install_dir/
@@ -110,4 +110,145 @@ php index.php Murphy exclude="packages/killerapp/make"
 
 ## Database fixtures
 
+NB: Murphy database fixtures currently work only with the mysql library in PHP.
 
+The way that Murphy handles database fixtures has been heavily inspired by http://lettuce.it/ so I'd first like to give a very brief explanation of what a database fixture is, how I've worked with them in the past and why I was so impressed by Lettuce.
+
+A simple way to think about database fixtures and "cut through the jargon" is just to imagine you have some code and it operates on some data that is stored in a database. Imagine you're testing your code by submitting a form, and each time you submit the form, you go and look in the database to see if the result was correct. If it's not correct, you fix your code and try again. In order to speed things up, you might have a file created with ```mysqldump``` in order to re-import your "base line" data after each test.
+
+That "base line" data is what you would call a fixture. It's something that should exist prior to your test code running.
+
+Now in order to have that data in the database to begin with you had to get it in there somehow - either with forms or you wrote some SQL statements by hand. If you're using a framework that has scaffolding (ie. a system that automatically generates web forms based on your database structure) then it would probably be simpler to use those forms to submit your test data, then do a database dump so you had your fixture file.
+
+When creating database fixtures with PHPUnit you create an XML document which kind of approximates a table structure, eg. one node per "row" with content being in attributes. It's quite honestly one of the worst tasks I have ever had to perform as a programmer.
+
+The problem with all three of these methods (writing SQL by hand, using some scaffolded forms or creating blood curdling XML documents) is two fold:
+
+1. You have to account for all fields/columns in your tables, even if the data in them is inconsequential to the test you're writing
+
+2. You have to hold the "mapping" of objects in your head (or on a piece of paper)
+
+To illustrate that last point, here's a simple example. Say you have two tables user and group, and they are in a many to many relationship with a joining table user_in_group your insert queries might look something like this:
+
+```
+INSERT INTO user(user_id,name) VALUES(1,'Iain');
+INSERT INTO group(group_id,name) VALUES(1,'Coders');
+INSERT INTO user_in_group(user_id,group_id) VALUES(1,1);
+```
+
+As you can see I've had to hold "in my head" the fact that Iain (uid 1) is a member of the group Coders (gid 1). When dealing with complex databases this quickly spirals completely out of control.
+
+The approach that Lettuce is quite ingenious. The "fixture" format is just a pipe delimited table-like representation of data in whatever format is most convenient to you. So the above could be written as:
+
+```
+user name | group name
+Iain      | Coders
+```
+
+In Lettuce, you then define a function which recevies each of these "rows" as an array (or rather a Dictionary in Python). For each row, you can write code which will insert the rows into the database. By doing this with code, you're able to automatically populate certain fields, derive values for one field from another, and more importantly scale the production of lots of fixture data into a very complex database without completely caving in your skull.
+
+So without further ado, here is the way to create a fixture in Murphy:
+
+```php
+    /**
+    * @database killerapp
+    * @tables user,group,user_in_group
+    * user  | group
+    * Pete  | Sydney
+    * Iain  | Canberra
+    */
+    \murphy\Fixture::add(function($row)
+    {
+        mysql_query('INSERT INTO user(name) VALUES(\''.$row['user'].'\'');
+        $user_id = mysql_insert_id();
+        mysql_query('INSERT INTO group(name) VALUES(\''.$row['group'].'\'');
+        $group_id = mysql_insert_id();
+        mysql_query('INSERT INTO user_in_group(user_id,group_id) VALUES('.(int)$user_id.','.(int)$group_id.')');
+    });
+```
+
+As you can see, each "row" of my fixture is passed into the anonymous function below it sequentially, and I can write some code that creates the structure I need.
+
+But the best thing is that when I'm writing my fixture data, I can think in terms of the "outcome" for my application - ie. that the user Pete is in the group Sydney, not that Pete has user id 1 and the group Sydney has user id 1 and therefore I need to make an entry for 1,1 in the user_in_group table.
+
+Just like the test code, you can organise your fixture code however you like. You can namespace your fixture file, and put common tasks into functions or separate files if they're used by more than one fixture etc. Your fixtures are just like any other piece of code in your database.
+
+In order to use a fixture from your test code, you load and execute it. In your ```default.run.php``` file you would put the following code at the start of your test:
+
+```php
+
+<?php
+\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute();
+```
+
+The only problem is now your data has been created in a database that you don't know how to access. You can pass in an anonymous function to the ```execute()``` method that will receive the details of the new test database that was created in order to allow you to establish a connection to the test database:
+
+```php
+\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases) use(&$conn)
+{   
+    //get the connection details for the killerapp database
+    $aliases = $aliases['killerapp'];
+    $host = $aliases[0];
+    $username = $aliases[1];
+    $password = $aliases[2];
+    $dbname = $aliases[3];
+    mysql_connect($host,$username,$password);
+    mysql_select_db($dbname);
+});
+```
+
+The rest of your test will now have access to that test database. You can include more than one fixture in any file - they will be executed sequentially. You can also load multiple fixtures together and have them executed all at once using the ```also()``` method. This can help you to keep your fixtures modular and reusable:
+
+```php
+//load some base fixture data
+murphy\Fixture::load(dirname(__FILE__).'/../common/base.php')
+//also load some extra fixture data
+->also(dirname(__FILE__).'/extra.php')
+->execute(function($aliases)
+{
+    //get the connection details for the killerapp database
+    $aliases = $aliases['killerapp'];
+    $host = $aliases[0];
+    $username = $aliases[1];
+    $password = $aliases[2];
+    $dbname = $aliases[3];
+    mysql_connect($host,$username,$password);
+    mysql_select_db($dbname);
+});
+```
+
+## Non-database fixtures
+
+You can also use the Fixture system to create non-database fixtures. If you just omit the ```@database``` and ```@tables``` decorators in the docblock above your fixture, the system will still split the data in your fixture up and pass it in as a bunch of rows. For example you could use it to create a data file:
+
+```php
+/**
+* user | group
+* Iain | Sydney
+* Pete | Canberra
+*/
+murphy\Fixture::add(function($row)
+{
+    file_put_contents(dirname(__FILE__).'../../cache/data.txt','"'.implode('","',$row).'"',FILE_APPEND);
+});
+```
+
+You could also use this style of fixture to _create_ your database if it didn't already exist (for example if you were create a re-usable module that didn't expect to have a database already installed or to know the name of the database that would be present.
+
+## Running database fixtures
+
+When you run a database fixture you need to pass in the root password of your mysql install as a ```mysql_root``` parameter to Murphy on the command line:
+
+```
+php index.php Murphy mysql_root=MYPASS
+```
+
+## Convergence Testing
+
+Some people may be a bit uncomfortable with this style of testing, because if you're writing code to create the fixtures that your tests run against, and then your tests are just like any other piece of code, doesn't that mean you'll just have more bugs?
+
+The way I see it is that you're writing two pieces of code that test each other, and converging on quality. That's why I'd like to call this style of testing Convergence testing.
+
+The chances that you will create completely complementary bugs is remote, but not impossible. It will happen. And when it does, you'll fix your tests, and that's one less bug to worry about.
+
+The goal of convergence testing is not to produce bug free code, but to fix each bug only once.
