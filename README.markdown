@@ -138,7 +138,7 @@ INSERT INTO user_in_group(user_id,group_id) VALUES(1,1);
 
 As you can see I've had to hold "in my head" the fact that Iain (uid 1) is a member of the group Coders (gid 1). When dealing with complex databases this quickly spirals completely out of control.
 
-The approach that Lettuce is quite ingenious. The "fixture" format is just a pipe delimited table-like representation of data in whatever format is most convenient to you. So the above could be written as:
+The approach that Lettuce has is quite ingenious. The "fixture" format is just a pipe delimited table-like representation of data in whatever format is most convenient to you. So the above could be written as:
 
 ```
 user name | group name
@@ -171,7 +171,7 @@ As you can see, each "row" of my fixture is passed into the anonymous function b
 
 But the best thing is that when I'm writing my fixture data, I can think in terms of the "outcome" for my application - ie. that the user Pete is in the group Sydney, not that Pete has user id 1 and the group Sydney has user id 1 and therefore I need to make an entry for 1,1 in the user_in_group table.
 
-Just like the test code, you can organise your fixture code however you like. You can namespace your fixture file, and put common tasks into functions or separate files if they're used by more than one fixture etc. Your fixtures are just like any other piece of code in your database.
+Just like the test code, you can organise your fixture code however you like. You can namespace your fixture file, and put common tasks into functions or separate files if they're used by more than one fixture etc. Your fixtures are just like any other piece of code in your application.
 
 In order to use a fixture from your test code, you load and execute it. In your ```default.run.php``` file you would put the following code at the start of your test:
 
@@ -184,7 +184,7 @@ In order to use a fixture from your test code, you load and execute it. In your 
 The only problem is now your data has been created in a database that you don't know how to access. You can pass in an anonymous function to the ```execute()``` method that will receive the details of the new test database that was created in order to allow you to establish a connection to the test database:
 
 ```php
-\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases) use(&$conn)
+\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases)
 {   
     //get the connection details for the killerapp database
     $aliases = $aliases['killerapp'];
@@ -233,7 +233,7 @@ murphy\Fixture::add(function($row)
 });
 ```
 
-You could also use this style of fixture to _create_ your database if it didn't already exist (for example if you were create a re-usable module that didn't expect to have a database already installed or to know the name of the database that would be present.
+You could also use this style of fixture to _create_ your database if it didn't already exist (for example if you were create a re-usable module that didn't expect to have a database already installed or to know the name of the database that would be present).
 
 ## Running database fixtures
 
@@ -242,6 +242,10 @@ When you run a database fixture you need to pass in the root password of your my
 ```
 php index.php Murphy mysql_root=MYPASS
 ```
+
+## A complex example
+
+One of the things that always pisses me off about reading through testing framework documentation is that they provide these really trivial examples. Well if you take a look at https://github.com/iaindooley/PluSQL you can see in the .murphy directories all the tests for how PluSQL should operate. The PluSQL README file also has info about how to download and run the Murphy tests.
 
 ## Convergence Testing
 
