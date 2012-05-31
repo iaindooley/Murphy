@@ -96,13 +96,22 @@ FAIL: error in: /path/to/RocketSled/packages/killerapp/make_things.class.php.mur
 Now update your ```makeThingsGoPop()``` method to return TRUE instead:
 
 ```php
-public makeValueGoPop()
+public function makeValueGoPop()
 {
     return TRUE;
 }
 ```
 
-If you re-run Murphy now, you should see a "." indicating that the test passed. Using the ```fail()``` method of the test runner ensures that a failure in one test will not result in a halting of the entire suite, and also that you will see the correct line number so you can easily locate the failure.
+If you re-run Murphy now, you should see a "." indicating that the test passed like this:
+
+```
+====Output from packages/killerapp/make_things.class.php.murphy/default.run.php===========
+.
+
+=====================================
+```
+
+Using the ```fail()``` method of the test runner ensures that a failure in one test will not result in a halting of the entire suite, and also that you will see the correct line number so you can easily locate the failure.
 
 You can add as many ".run.php" files as you like, and call them anything you like. You can namespace them, you can put common functionality into library files, basically anything that you would normally do when writing code, you can do to your tests.
 
