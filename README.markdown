@@ -44,7 +44,7 @@ Now you've made your class, and you want to start implementing some code. As you
             $this->value = $value;
         }
         
-        public makeValueGoPop()
+        public function makeValueGoPop()
         {
             return FALSE;
         }
@@ -70,7 +70,7 @@ Now in ```default.run.php``` you can add a test to the Murphy test harness:
     {
         $things = new MakeThings('ohai');
         
-        if($this->makeValueGoPop())
+        if($things->makeValueGoPop())
             $runner->pass();
         else
             $runner->fail('Did not make it go pop');
