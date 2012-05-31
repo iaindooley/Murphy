@@ -83,7 +83,17 @@ You can now run this from your RocketSled install root with:
 php index.php Murphy
 ```
 
-You will see your test fail. Now update your ```makeThingsGoPop()``` method to return TRUE instead:
+You will see your test fail with output like this:
+
+```
+====Output from packages/killerapp/make_things.class.php.murphy/default.run.php===========
+
+FAIL: error in: /path/to/RocketSled/packages/killerapp/make_things.class.php.murphy/default.run.php on line: 9: Did not make it go pop
+
+=====================================
+```
+
+Now update your ```makeThingsGoPop()``` method to return TRUE instead:
 
 ```php
 public makeValueGoPop()
