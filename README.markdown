@@ -1,6 +1,6 @@
 # Murphy - simple automated testing for RocketSled
 
-by: iain@workingsoftware.com.au
+by: iain@workingsoftware.com.au 
 
 Murphy is an automated testing framework that focuses on simplicity and accessibility.
 
