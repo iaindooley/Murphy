@@ -144,7 +144,7 @@
                 
                 if($cur_docblock !== NULL)
                     $cur_docblock[] = $cont;
-                else if(preg_match('/murphy\\\\Fixture::add\(/U',$cont,$matches))
+                else if(preg_match('/Murphy\\\\Fixture::add\(/U',$cont,$matches))
                     $docblocks[] = $previous_docblock;
             }
             

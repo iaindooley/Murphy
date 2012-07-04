@@ -78,7 +78,7 @@ CREATE TABLE `user_in_group` (
 
             Fixture::load(dirname(__FILE__).'/sample3.fixture.php')->execute();
             
-            foreach(Plusql::begin('live')->query('SELECT user_id,username FROM `user`')->user as $client)
+            foreach(Plusql::from('live')->user->select('user_id,username')->run()->user as $client)
                 echo $client->username.PHP_EOL;
         }
     }

@@ -12,7 +12,7 @@
                 $exclude = array();
             else
                 $exclude = explode(',',$exclude);
-            
+
             $tests = RocketSled\filteredPackages(function($arg)
             {
                 $ret = FALSE;
@@ -22,6 +22,7 @@
                 
                 return $ret;
             });
+die(print_r($tests));
 
             foreach($tests as $path)
             {
@@ -42,14 +43,14 @@
                         $use = TRUE;
                 }
                 
-                if(strpos($path,'.murphy/') === FALSE)
+                if(strpos($path,'.Murphy/') === FALSE)
                     $use = FALSE;
                 
                 if($use)
                 {
                     $output = '';
 
-                    exec('php index.php "murphy\\Test" path='.escapeshellarg($path).' mysql_root='.escapeshellarg(Args::get('mysql_root',Args::argv)),$output,$exit_code);
+                    exec('php index.php "Murphy\\Test" path='.escapeshellarg($path).' mysql_root='.escapeshellarg(Args::get('mysql_root',Args::argv)),$output,$exit_code);
                                 
                     if($exit_code)
                         echo 'FATAL ERROR: '.$path.' terminated abnormally'.PHP_EOL;
