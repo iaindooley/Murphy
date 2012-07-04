@@ -22,7 +22,6 @@
                 
                 return $ret;
             });
-die(print_r($tests));
 
             foreach($tests as $path)
             {
