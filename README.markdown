@@ -66,7 +66,7 @@ Now in ```default.run.php``` you can add a test to the Murphy test harness:
 
 ```php
 <?php
-    murphy\Test::add(function($runner)
+    Murphy\Test::add(function($runner)
     {
         $things = new MakeThings('ohai');
         
@@ -176,7 +176,7 @@ So without further ado, here is the way to create a fixture in Murphy:
     * Pete  | Sydney
     * Iain  | Canberra
     */
-    \murphy\Fixture::add(function($row)
+    \Murphy\Fixture::add(function($row)
     {
         mysql_query('INSERT INTO user(name) VALUES(\''.$row['user'].'\'');
         $user_id = mysql_insert_id();
@@ -197,13 +197,13 @@ In order to use a fixture from your test code, you load and execute it. In your 
 ```php
 
 <?php
-\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute();
+\Murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute();
 ```
 
 The only problem is now your data has been created in a database that you don't know how to access. You can pass in an anonymous function to the ```execute()``` method that will receive the details of the new test database that was created in order to allow you to establish a connection to the test database:
 
 ```php
-\murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases)
+\Murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases)
 {   
     //get the connection details for the killerapp database
     $aliases = $aliases['killerapp'];
@@ -220,7 +220,7 @@ The rest of your test will now have access to that test database. You can includ
 
 ```php
 //load some base fixture data
-murphy\Fixture::load(dirname(__FILE__).'/../common/base.php')
+Murphy\Fixture::load(dirname(__FILE__).'/../common/base.php')
 //also load some extra fixture data
 ->also(dirname(__FILE__).'/extra.php')
 ->execute(function($aliases)
@@ -246,7 +246,7 @@ You can also use the Fixture system to create non-database fixtures. If you just
 * Iain | Sydney
 * Pete | Canberra
 */
-murphy\Fixture::add(function($row)
+Murphy\Fixture::add(function($row)
 {
     file_put_contents(dirname(__FILE__).'../../cache/data.txt','"'.implode('","',$row).'"',FILE_APPEND);
 });
