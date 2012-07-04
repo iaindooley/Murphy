@@ -1,8 +1,8 @@
 <?php
-    namespace murphy;
+    namespace Murphy;
     use Args,Plusql;
 
-    class TestFixture implements \rocketsled\Runnable
+    class TestFixture implements \RocketSled\Runnable
     {
         public function run()
         {

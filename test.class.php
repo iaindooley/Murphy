@@ -1,8 +1,8 @@
 <?php
-    namespace murphy;
+    namespace Murphy;
     use Args,Closure;
 
-    class Test implements \rocketsled\Runnable
+    class Test implements \RocketSled\Runnable
     {
         private static $instance = NULL;
         private $tests;

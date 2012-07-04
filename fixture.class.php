@@ -1,5 +1,5 @@
 <?php
-    namespace murphy;
+    namespace Murphy;
     use Exception,Closure,Args;
     
     class Fixture

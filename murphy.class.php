@@ -1,5 +1,5 @@
 <?php
-    class Murphy implements rocketsled\Runnable
+    class Murphy implements RocketSled\Runnable
     {
         public function run()
         {
@@ -13,11 +13,11 @@
             else
                 $exclude = explode(',',$exclude);
             
-            $tests = rocketsled\filteredPackages(function($arg)
+            $tests = RocketSled\filteredPackages(function($arg)
             {
                 $ret = FALSE;
                 
-                if(rocketsled\endsWith($arg,'.run.php'))
+                if(RocketSled\endsWith($arg,'.run.php'))
                     $ret = $arg;
                 
                 return $ret;
