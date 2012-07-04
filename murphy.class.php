@@ -42,7 +42,7 @@
                         $use = TRUE;
                 }
                 
-                if(strpos($path,'.Murphy/') === FALSE)
+                if(strpos($path,'.murphy/') === FALSE)
                     $use = FALSE;
                 
                 if($use)
