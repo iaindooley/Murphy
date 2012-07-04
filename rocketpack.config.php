@@ -1,5 +1,5 @@
 <?php
-    RocketPack\Install::package('https://github.com/iaindooley/Murphy',array(0,2,1));
+    RocketPack\Install::package('https://github.com/iaindooley/Murphy',array(0,2,2));
 
     RocketPack\Dependencies::register(function()
     {
