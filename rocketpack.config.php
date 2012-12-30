@@ -4,6 +4,7 @@
     RocketPack\Dependencies::register(function()
     {
         RocketPack\Dependency::forPackage('https://github.com/iaindooley/Murphy')
+        ->into(RocketSled::rs_dir())
         ->add('https://github.com/iaindooley/Args',array(0,2,1))
         ->verify();
     });
