@@ -13,11 +13,11 @@
             else
                 $exclude = explode(',',$exclude);
 
-            $tests = RocketSled\filteredPackages(function($arg)
+            $tests = RocketSled::filteredPackages(function($arg)
             {
                 $ret = FALSE;
                 
-                if(RocketSled\endsWith($arg,'.run.php'))
+                if(RocketSled::endsWith($arg,'.run.php'))
                     $ret = $arg;
                 
                 return $ret;
@@ -32,13 +32,13 @@
 
                 foreach($exclude as $exc)
                 {
-                    if(strpos($path,$exc) === 0)
+                    if(RocketSled::endsWith(dirname($path),$exc))
                         $use = FALSE;
                 }
 
                 foreach($include as $inc)
                 {
-                    if(strpos($path,$inc) === 0)
+                    if(RocketSled::endsWith(dirname($path),$inc))
                         $use = TRUE;
                 }
                 
