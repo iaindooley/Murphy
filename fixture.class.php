@@ -77,8 +77,8 @@
                                                 $mysql_root,
                                                 md5($database));
 
-                    mysql_query('DROP DATABASE IF EXISTS '.$alias) or die(mysql_error());
-                    mysql_query('CREATE DATABASE '.$alias) or die(mysql_error());
+                    mysql_query('DROP DATABASE IF EXISTS `'.$alias.'`') or die(mysql_error());
+                    mysql_query('CREATE DATABASE `'.$alias.'`') or die(mysql_error());
                     mysql_select_db($alias);
                     
                     foreach($create_table_statements as $stmt)
