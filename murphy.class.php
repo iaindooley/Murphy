@@ -32,13 +32,13 @@
 
                 foreach($exclude as $exc)
                 {
-                    if(strpos($path,realpath($exc)) === 0)
+                    if(strpos(realpath($path),realpath($exc)) === 0)
                         $use = FALSE;
                 }
 
                 foreach($include as $inc)
                 {
-                    if(strpos($path,realpath($inc)) === 0)
+                    if(strpos(realpath($path),realpath($inc)) === 0)
                         $use = TRUE;
                 }
                 
