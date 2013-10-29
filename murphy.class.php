@@ -13,11 +13,11 @@
             else
                 $exclude = explode(',',$exclude);
 
-            $tests = RocketSled\filteredPackages(function($arg)
+            $tests = RocketSled::filteredPackages(function($arg)
             {
                 $ret = FALSE;
                 
-                if(RocketSled\endsWith($arg,'.run.php'))
+                if(RocketSled::endsWith($arg,'.run.php'))
                     $ret = $arg;
                 
                 return $ret;

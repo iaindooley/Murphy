@@ -1,9 +1,7 @@
 <?php
-    RocketPack\Install::package('https://github.com/iaindooley/Murphy',array(0,2,2));
-
-    RocketPack\Dependencies::register(function()
+    RocketPack\Dependency::register(function()
     {
-        RocketPack\Dependency::forPackage('https://github.com/iaindooley/Murphy')
-        ->add('https://github.com/iaindooley/Args',array(0,2,1))
-        ->verify();
+        RocketPack\Dependency::into(dirname(__FILE__).'/../')
+        ->add('https://github.com/iaindooley/Args','b5ad86d1193eb7efbe7be3ba26ff5b4e5a0476d4')
+        ;
     });

@@ -8,6 +8,8 @@ The idea is not that it helps you produce bug free code, but that it helps you o
 
 The philosophy is simple: when you write a piece of code, write another piece of code that runs it.
 
+#NB: If you were using Murphy prior to October 30, 2013 this release will not work with older versions of RocketSled. If you are using an older version of RocketSled (tagged 1.3 or prior) then you'll need to use Murphy released tagged 0.2.3 or prior.
+
 ## Goals:
 
 * Provide a drastically simpler and more accessible method of automated testing than NUnit style frameworks (eg. PHPUnit)
