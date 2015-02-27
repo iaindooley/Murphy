@@ -14,10 +14,21 @@ Non db fixture 2
 iain@workingsoftware.com.au
 iaindooley@gmail.com'.PHP_EOL.PHP_EOL;
 
-            if(!$mysql_root = Args::get('mysql_root',Args::argv))
-                die('You need to pass in mysql_root');
+            if(!$dbconfig_path = Args::get('dbconfig',Args::argv))
+            {
+                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                exit(1);
+            }
 
-            $this->link = mysqli_connect('localhost','root',$mysql_root) or die(mysqli_error($this->link));
+            if(!$dbconfig = include($dbconfig_path))
+            {
+                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                exit(1);
+            }
+
+            $this->link = mysqli_connect($dbconfig['db_host'],
+                                         $dbconfig['db_user'],
+                                         $dbconfig['db_pass']) or die(mysqli_error($this->link));
             $this->link->query('DROP DATABASE IF EXISTS test_fixture1');
             $this->link->query('DROP DATABASE IF EXISTS test_fixture2');
             $this->link->query('CREATE DATABASE test_fixture1');

@@ -50,15 +50,23 @@
 
             if(count($databases))
             {
-                if(!$mysql_root = Args::get('mysql_root',Args::argv))
+                if(!$dbconfig_path = Args::get('dbconfig',Args::argv))
                 {
-                    echo 'You need to include mysql_root in the command line arguments'.PHP_EOL;
+                    echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                    exit(1);
+                }
+
+                if(!$dbconfig = include($dbconfig_path))
+                {
+                    echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
                     exit(1);
                 }
 
                 foreach($databases as $database => $tables)
                 {
-                    $this->link = mysqli_connect('localhost','root',$mysql_root);
+                    $this->link = mysqli_connect($dbconfig['db_host'],
+                                                 $dbconfig['db_user'],
+                                                 $dbconfig['db_pass']);
                     $this->link->select_db($database);
                     $tables = array_unique($tables);
                     $create_table_statements = array();
@@ -73,9 +81,9 @@
                     }
 
                     $alias = md5($database);
-                    $aliases[$database] = array('localhost',
-                                                'root',
-                                                $mysql_root,
+                    $aliases[$database] = array($dbconfig['db_host'],
+                                                $dbconfig['db_user'],
+                                                $dbconfig['db_pass'],
                                                 md5($database));
 
                     $this->link->query('DROP DATABASE IF EXISTS `'.$alias.'`') or die(mysqli_error($this->link));

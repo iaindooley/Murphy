@@ -258,10 +258,10 @@ You could also use this style of fixture to _create_ your database if it didn't 
 
 ## Running database fixtures
 
-When you run a database fixture you need to pass in the root password of your mysql install as a ```mysql_root``` parameter to Murphy on the command line:
+When you run a database fixture you need to pass in the config file of your mysql install as a ```dbconfig``` parameter to Murphy on the command line:
 
 ```
-php index.php Murphy mysql_root=MYPASS
+php index.php Murphy dbconfig=/path/to/dbconfig.php
 ```
 
 ## A complex example
