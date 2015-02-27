@@ -6,6 +6,7 @@
     {
         private $callbacks;
         private $data;
+        private $link;
         private static $instance = NULL;
 
         private function __construct()
@@ -57,17 +58,17 @@
 
                 foreach($databases as $database => $tables)
                 {
-                    mysql_connect('localhost','root',$mysql_root);
-                    mysql_select_db($database);
+                    $this->link = mysqli_connect('localhost','root',$mysql_root);
+                    $this->link->select_db($database);
                     $tables = array_unique($tables);
                     $create_table_statements = array();
 
                     foreach($tables as $table)
                     {
-                        if(!$query = mysql_query('SHOW CREATE TABLE `'.$table.'`'))
-                            throw new Exception(mysql_error());
+                        if(!$query = $this->link->query('SHOW CREATE TABLE `'.$table.'`'))
+                            throw new Exception(mysqli_error($this->link));
 
-                        $row = mysql_fetch_assoc($query);
+                        $row = $query->fetch_assoc();
                         $create_table_statements[] = $row['Create Table'];
                     }
 
@@ -77,12 +78,12 @@
                                                 $mysql_root,
                                                 md5($database));
 
-                    mysql_query('DROP DATABASE IF EXISTS `'.$alias.'`') or die(mysql_error());
-                    mysql_query('CREATE DATABASE `'.$alias.'`') or die(mysql_error());
-                    mysql_select_db($alias);
+                    $this->link->query('DROP DATABASE IF EXISTS `'.$alias.'`') or die(mysqli_error($this->link));
+                    $this->link->query('CREATE DATABASE `'.$alias.'`') or die(mysqli_error($this->link));
+                    $this->link->select_db($alias);
 
                     foreach($create_table_statements as $stmt)
-                        mysql_query($stmt) or die(mysql_error());
+                        $this->link->query($stmt) or die(mysqli_error($this->link));
                 }
 
                 if(!$db_connect instanceof Closure)
@@ -92,7 +93,7 @@
             foreach($this->data as $key => $d)
             {
                 if(isset($aliases[$d['database']]))
-                    mysql_select_db($aliases[$d['database']][3]);
+                    $this->link->select_db($aliases[$d['database']][3]);
 
                 $args = array();
 
