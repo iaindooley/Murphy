@@ -13,6 +13,18 @@
             else
                 $exclude = explode(',',$exclude);
 
+            if(!$dbconfig_path = Args::get('dbconfig',Args::argv))
+            {
+                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                exit(1);
+            }
+
+            if(!$dbconfig = include($dbconfig_path))
+            {
+                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                exit(1);
+            }
+
             $tests = RocketSled::filteredPackages(function($arg)
             {
                 $ret = FALSE;
