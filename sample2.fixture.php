@@ -8,7 +8,7 @@
     */
     Murphy\Fixture::add(function($data)
     {
-        mysql_query('INSERT INTO `group`(group_id,group_name) VALUES('.(int)$data['group_id'].',\''.mysql_real_escape_string($data['group_name']).'\')') or die(mysql_error());
-        mysql_query('INSERT INTO `user`(user_id,username) VALUES('.(int)$data['user_id'].',\''.mysql_real_escape_string($data['username']).'\')') or die(mysql_error());
-        mysql_query('INSERT INTO user_in_group(user_id,group_id) VALUES('.(int)$data['user_id'].','.(int)$data['group_id'].')') or die(mysql_error());
+        $this->link->query('INSERT INTO `group`(group_id,group_name) VALUES('.(int)$data['group_id'].',\''.mysqli::real_escape_string($data['group_name']).'\')') or die(mysqli_error($this->link));
+        $this->link->query('INSERT INTO `user`(user_id,username) VALUES('.(int)$data['user_id'].',\''.mysqli::real_escape_string($data['username']).'\')') or die(mysqli_error($this->link));
+        $this->link->query('INSERT INTO user_in_group(user_id,group_id) VALUES('.(int)$data['user_id'].','.(int)$data['group_id'].')') or die(mysqli_error($this->link));
     });

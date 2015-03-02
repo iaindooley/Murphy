@@ -1,6 +1,6 @@
 # Murphy - simple automated testing for RocketSled
 
-by: iain@workingsoftware.com.au 
+by: iain@workingsoftware.com.au
 
 Murphy is an automated testing framework that focuses on simplicity and accessibility.
 
@@ -45,7 +45,7 @@ Now you've made your class, and you want to start implementing some code. As you
         {
             $this->value = $value;
         }
-        
+
         public function makeValueGoPop()
         {
             return FALSE;
@@ -71,7 +71,7 @@ Now in ```default.run.php``` you can add a test to the Murphy test harness:
     Murphy\Test::add(function($runner)
     {
         $things = new MakeThings('ohai');
-        
+
         if($things->makeValueGoPop())
             $runner->pass();
         else
@@ -180,11 +180,11 @@ So without further ado, here is the way to create a fixture in Murphy:
     */
     \Murphy\Fixture::add(function($row)
     {
-        mysql_query('INSERT INTO user(name) VALUES(\''.$row['user'].'\'');
-        $user_id = mysql_insert_id();
-        mysql_query('INSERT INTO group(name) VALUES(\''.$row['group'].'\'');
-        $group_id = mysql_insert_id();
-        mysql_query('INSERT INTO user_in_group(user_id,group_id) VALUES('.(int)$user_id.','.(int)$group_id.')');
+        $this->link->query('INSERT INTO user(name) VALUES(\''.$row['user'].'\'');
+        $user_id = mysqli_insert_id($this->link);
+        $this->link->query('INSERT INTO group(name) VALUES(\''.$row['group'].'\'');
+        $group_id = mysqli_insert_id($this->link);
+        $this->link->query('INSERT INTO user_in_group(user_id,group_id) VALUES('.(int)$user_id.','.(int)$group_id.')');
     });
 ```
 
@@ -206,15 +206,15 @@ The only problem is now your data has been created in a database that you don't 
 
 ```php
 \Murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases)
-{   
+{
     //get the connection details for the killerapp database
     $aliases = $aliases['killerapp'];
     $host = $aliases[0];
     $username = $aliases[1];
     $password = $aliases[2];
     $dbname = $aliases[3];
-    mysql_connect($host,$username,$password);
-    mysql_select_db($dbname);
+    $this->link = mysqli_connect($host,$username,$password);
+    $this->link->select_db($dbname);
 });
 ```
 
@@ -233,8 +233,8 @@ Murphy\Fixture::load(dirname(__FILE__).'/../common/base.php')
     $username = $aliases[1];
     $password = $aliases[2];
     $dbname = $aliases[3];
-    mysql_connect($host,$username,$password);
-    mysql_select_db($dbname);
+    $this->link = mysqli_connect($host,$username,$password);
+    $this->link->select_db($dbname);
 });
 ```
 
@@ -258,10 +258,10 @@ You could also use this style of fixture to _create_ your database if it didn't 
 
 ## Running database fixtures
 
-When you run a database fixture you need to pass in the root password of your mysql install as a ```mysql_root``` parameter to Murphy on the command line:
+When you run a database fixture you need to pass in the config file of your mysql install as a ```dbconfig``` parameter to Murphy on the command line:
 
 ```
-php index.php Murphy mysql_root=MYPASS
+php index.php Murphy dbconfig=/path/to/dbconfig.php
 ```
 
 ## A complex example
