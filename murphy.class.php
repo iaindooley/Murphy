@@ -13,15 +13,19 @@
             else
                 $exclude = explode(',',$exclude);
 
-            if(!$dbconfig_path = Args::get('dbconfig',Args::argv))
+            if(!($dbconfig_path = Args::get('dbconfig',Args::argv)) || !($dbconfig = include($dbconfig_path)))
             {
-                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
-                exit(1);
-            }
-
-            if(!$dbconfig = include($dbconfig_path))
-            {
-                echo 'You need to include dbconfig in the command line arguments'.PHP_EOL;
+                echo "You need to include 'dbconfig' in the command line arguments.".PHP_EOL;
+                echo "The file should have the following format: ".PHP_EOL;
+                echo "<?php".PHP_EOL;
+                echo "return array('db_host' => 'localhost',".PHP_EOL;
+                echo "             'db_user' => 'root',".PHP_EOL;
+                echo "             'db_pass' => 'root',".PHP_EOL;
+                echo "             'db_name' => 'killerapp',".PHP_EOL;
+                echo "             'db_port' => 3309".PHP_EOL;
+                echo "?>".PHP_EOL;
+                echo PHP_EOL;
+                echo "Usage: php index.php Murphy dbconfig=/path/to/dbconfig.php".PHP_EOL;
                 exit(1);
             }
 

@@ -172,7 +172,6 @@ So without further ado, here is the way to create a fixture in Murphy:
 
 ```php
     /**
-    * @database killerapp
     * @tables user,group,user_in_group
     * user  | group
     * Pete  | Sydney
@@ -199,13 +198,13 @@ In order to use a fixture from your test code, you load and execute it. In your 
 ```php
 
 <?php
-\Murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute();
+\Murphy\Fixture::load('killerapp', dirname(__FILE__).'/fixture.php')->execute();
 ```
 
 The only problem is now your data has been created in a database that you don't know how to access. You can pass in an anonymous function to the ```execute()``` method that will receive the details of the new test database that was created in order to allow you to establish a connection to the test database:
 
 ```php
-\Murphy\Fixture::load(dirname(__FILE__).'/fixture.php')->execute(function($aliases)
+\Murphy\Fixture::load('killerapp', dirname(__FILE__).'/fixture.php')->execute(function($aliases)
 {
     //get the connection details for the killerapp database
     $aliases = $aliases['killerapp'];
@@ -224,7 +223,7 @@ The rest of your test will now have access to that test database. You can includ
 //load some base fixture data
 Murphy\Fixture::load(dirname(__FILE__).'/../common/base.php')
 //also load some extra fixture data
-->also(dirname(__FILE__).'/extra.php')
+->also('killerapp', dirname(__FILE__).'/extra.php')
 ->execute(function($aliases)
 {
     //get the connection details for the killerapp database
@@ -262,6 +261,19 @@ When you run a database fixture you need to pass in the config file of your mysq
 
 ```
 php index.php Murphy dbconfig=/path/to/dbconfig.php
+```
+
+The file dbconfig.php should have the following format:
+
+```
+<?php
+return array('db_host' => 'localhost',
+             'db_user' => 'root',
+             'db_pass' => 'root',
+             'db_name' => 'killerapp',
+             'db_port' => 3309
+             );
+?>
 ```
 
 ## A complex example
