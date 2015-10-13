@@ -43,7 +43,7 @@
                     $test($this);
                 }
                 
-                catch(Exception $exc)
+                catch(\Exception $exc)
                 {
                     echo PHP_EOL.self::getExceptionTraceAsString($exc).PHP_EOL;
                 }
