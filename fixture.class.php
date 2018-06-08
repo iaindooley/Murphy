@@ -75,9 +75,15 @@
                     {
                         if(!$query = $this->link->query('SHOW CREATE TABLE `'.$table.'`'))
                             throw new Exception(mysqli_error($this->link));
+                        if(!$user = $this->link->query("SELECT USER()"))
+                            throw new Exception(mysqli_error($this->link));
 
+                        $user_row = $user->fetch_assoc();
+                        $user_data = split("@", $user_row["USER()"]);
                         $row = $query->fetch_assoc();
-                        $create_table_statements[] = getCreateQuery($row);
+                        $create_table_statements[] = getCreateQuery($row,
+                                                                    $user_data[0],
+                                                                    $user_data[1]);
                     }
 
                     $alias = md5($database);
@@ -194,13 +200,28 @@
     class InvalidFixtureFormatException extends Exception{}
     class DbFixtureConnectionException extends Exception{}
 
-function getCreateQuery($row) {
-    // Drop the ALGORITHM and DEFINER values from the
-    // CREATE query
-    return isset($row['Create Table']) ?
-        $row['Create Table'] :
-        preg_replace(
-            "/CREATE (.*?) VIEW/",
-            "CREATE VIEW",
-            $row['Create View']);
+function getCreateQuery($row, $user, $domain) {
+    if(isset($row['Create Table'])) {
+        return $row['Create Table'];
+    }
+    else {
+        $query = $row['Create View'];
+        if($user) {
+            $definer = "`{$user}`@`{$domain}`";
+            return preg_replace(
+                "/DEFINER=`(.*?)`@`(.*?)`/",
+                "DEFINER={$definer}",
+                $query
+            );
+        }
+        else {
+            // Drop the ALGORITHM and DEFINER values from the
+            // CREATE query
+            return preg_replace(
+                "/CREATE (.*?) VIEW/",
+                "CREATE VIEW",
+                $query
+            );
+        }
+    }
 }
