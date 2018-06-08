@@ -77,7 +77,7 @@
                             throw new Exception(mysqli_error($this->link));
 
                         $row = $query->fetch_assoc();
-                        $create_table_statements[] = $row['Create Table'];
+                        $create_table_statements[] = getCreateQuery($row);
                     }
 
                     $alias = md5($database);
@@ -193,3 +193,14 @@
     class DuplicateFixtureException extends Exception{}
     class InvalidFixtureFormatException extends Exception{}
     class DbFixtureConnectionException extends Exception{}
+
+function getCreateQuery($row) {
+    // Drop the ALGORITHM and DEFINER values from the
+    // CREATE query
+    return isset($row['Create Table']) ?
+        $row['Create Table'] :
+        preg_replace(
+            "/CREATE (.*?) VIEW/",
+            "CREATE VIEW",
+            $row['Create View']);
+}
