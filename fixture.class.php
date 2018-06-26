@@ -207,10 +207,9 @@ function getCreateQuery($row, $user, $domain) {
     else {
         $query = $row['Create View'];
         if($user) {
-            $definer = "`{$user}`@`{$domain}`";
             return preg_replace(
                 "/DEFINER=`(.*?)`@`(.*?)`/",
-                "DEFINER={$definer}",
+                "",
                 $query
             );
         }
