@@ -79,7 +79,7 @@
                             throw new Exception(mysqli_error($this->link));
 
                         $user_row = $user->fetch_assoc();
-                        $user_data = split("@", $user_row["USER()"]);
+                        $user_data = explode("@", $user_row["USER()"]);
                         $row = $query->fetch_assoc();
                         $create_table_statements[] = getCreateQuery($row,
                                                                     $user_data[0],
